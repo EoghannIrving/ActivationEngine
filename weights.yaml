@@ -1,0 +1,11 @@
+# Scoring weights for task ranking
+
+energy_weight: 1.0
+executive_cost_weight: 1.5
+context_match_weight: 0.5
+
+# Tag match scoring (optional future use)
+preferred_tags:
+  evening: 0.3
+  reflective: 0.4
+  visual: 0.2
