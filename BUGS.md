@@ -10,3 +10,14 @@ The following are potential bugs or design concerns identified in the current co
 6. **Non‑deterministic tag order** – `get_tags()` converts the list of tags to a `set` and back to a list, which loses order and may produce different results for the same input.
 7. **Imported but unused module** – `os` is imported in `main.py` but never used.
 8. **Lack of input validation** – `UserState.energy`, `Task.energy_cost` and `Task.executive_cost` are expected to be in a 1–5 range, but no validation enforces this, allowing nonsensical values.
+
+9. **Missing weight keys** – `load_weights()` assumes required keys are present. An empty or incomplete YAML file causes `KeyError` when ranking.
+10. **Weights file not hot-reloadable** – The weights are loaded once at startup; updating `weights.yaml` has no effect until the service restarts.
+11. **Overly broad exception handling** – The API endpoints wrap every error as HTTP 500, masking validation and client errors.
+12. **Unused field: `Context.projects_active`** – Defined in the model but never referenced by the engine.
+13. **Unused field: `Task.effort`** – Collected from requests but ignored in scoring logic.
+14. **No `.dockerignore`** – Docker builds include the entire repository, increasing image size.
+15. **Synchronous endpoints** – Route handlers use regular functions, blocking the event loop during heavy work.
+16. **Hard-coded configuration values** – The weights file path and server port can't be overridden via environment variables.
+17. **No error logging** – Failures simply raise an exception with no log output for troubleshooting.
+18. **`recent-activity` tag lacks time check** – Any non-empty `last_activity` triggers the tag regardless of when it occurred.
