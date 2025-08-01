@@ -49,3 +49,6 @@ docker run -p 80:80 activation-engine
 ## Roadmap & Known Issues
 Planned enhancements and known bugs are documented in [`ROADMAP.md`](ROADMAP.md) and [`BUGS.md`](BUGS.md).
 
+
+## License
+This project is licensed under the [GNU General Public License version 3](LICENSE).
