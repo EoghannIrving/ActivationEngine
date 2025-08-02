@@ -7,6 +7,7 @@ Activation Engine is a small FastAPI service that scores and tags user tasks bas
 - Rank tasks using simple scoring rules defined in `weights.yaml`.
 - Exposed REST endpoints via FastAPI (`/get-tags` and `/rank-tasks`).
 - Dockerfile for containerized deployment.
+- Pick an appropriate prompt category from a list using mood and energy cues.
 
 ## Requirements
 - Python 3.11+
@@ -34,6 +35,9 @@ Input: a `UserState` object. Returns a list of context tags derived from the use
 Input: a `TaskRequest` object containing `UserState` and a list of `Task` objects. Returns the tasks ranked from highest to lowest score.
 
 See `main.py` for model definitions.
+
+### `POST /prompt-category`
+Input: a `PromptCategoryRequest` with `mood`, `energy`, and `categories` fields. Returns a single category deemed most suitable for the user's state.
 
 ## Configuration
 
