@@ -32,6 +32,12 @@ class TaskRequest(BaseModel):
     user_state: UserState
     tasks: List[Task]
 
+
+class PromptCategoryRequest(BaseModel):
+    mood: Optional[str]
+    energy: int  # 1-5
+    categories: List[str]
+
 # --- Load weights ---
 def load_weights():
     try:
@@ -91,6 +97,35 @@ class ActivationEngine:
             })
         return sorted(ranked, key=lambda x: -x["score"])
 
+    def pick_prompt_category(self, mood: Optional[str], energy: int, categories: List[str]) -> Optional[str]:
+        """Select a prompt category using simple mood and energy heuristics."""
+        if not categories:
+            return None
+
+        mood_lc = mood.lower() if mood else None
+        categories_lc = [c.lower() for c in categories]
+
+        # First try to match the provided mood directly
+        if mood_lc:
+            for idx, cat in enumerate(categories_lc):
+                if mood_lc in cat:
+                    return categories[idx]
+
+        # Next fall back to energy-based keywords
+        if energy <= 2:
+            low_keywords = ["low", "rest", "relax", "chill", "calm"]
+            for idx, cat in enumerate(categories_lc):
+                if any(k in cat for k in low_keywords):
+                    return categories[idx]
+        elif energy >= 4:
+            high_keywords = ["high", "active", "intense", "workout", "party"]
+            for idx, cat in enumerate(categories_lc):
+                if any(k in cat for k in high_keywords):
+                    return categories[idx]
+
+        # If no match was found, return the first category
+        return categories[0]
+
 engine = ActivationEngine()
 
 # --- Endpoints ---
@@ -107,5 +142,14 @@ def rank_tasks(task_request: TaskRequest):
     try:
         ranked = engine.rank_tasks(task_request.user_state, task_request.tasks)
         return {"candidates": ranked}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/prompt-category")
+def prompt_category(req: PromptCategoryRequest):
+    try:
+        category = engine.pick_prompt_category(req.mood, req.energy, req.categories)
+        return {"category": category}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
